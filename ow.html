@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Herramientas Médicas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input, label {
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Herramientas Médicas</h1>
+
+    <!-- Calculadora de Fecha de Vencimiento del Embarazo -->
+    <div>
+        <h2>Calculadora de Fecha de Vencimiento del Embarazo</h2>
+        <p>Ingrese la fecha del último ciclo menstrual:</p>
+        <input type="date" id="lastMenstrualDate">
+        <button onclick="calcularFechaDeVencimiento()">Calcular</button>
+        <p>Fecha de Vencimiento Estimada: <span id="resultadoFecha"></span></p>
+    </div>
+
+    <!-- Generador de Recetas Médicas Electrónicas -->
+    <div>
+        <h2>Generador de Recetas Médicas Electrónicas</h2>
+        <p>Información del paciente:</p>
+        <label for="nombre">Nombre del Paciente:</label>
+        <input type="text" id="nombre">
+        <br>
+        <label for="edad">Edad:</label>
+        <input type="text" id="edad">
+        <br>
+        <p>Información de la receta:</p>
+        <label for="medicamento">Medicamento:</label>
+        <input type="text" id="medicamento">
+        <br>
+        <label for="dosis">Dosis:</label>
+        <input type="text" id="dosis">
+        <br>
+        <button onclick="generarReceta()">Generar Receta</button>
+        <button id="descargarPDF" style="display: none;">Descargar PDF</button>
+        <p>Receta Médica:</p>
+        <div id="receta"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        function calcularFechaDeVencimiento() {
+            var lastMenstrualDate = new Date(document.getElementById('lastMenstrualDate').value);
+            var gestationPeriod = 280;  // 280 días de embarazo promedio
+
+            if (isNaN(lastMenstrualDate.getTime())) {
+                alert('Por favor, ingrese una fecha válida del último ciclo menstrual.');
+            } else {
+                var estimatedDueDate = new Date(lastMenstrualDate);
+                estimatedDueDate.setDate(lastMenstrualDate.getDate() + gestationPeriod);
+
+                var options = { year: 'numeric', month: 'long', day: 'numeric' };
+                var formattedDueDate = estimatedDueDate.toLocaleDateString('es-ES', options);
+
+                document.getElementById('resultadoFecha').textContent = formattedDueDate;
+            }
+        }
+
+        function generarReceta() {
+            var nombre = document.getElementById('nombre').value;
+            var edad = document.getElementById('edad').value;
+            var medicamento = document.getElementById('medicamento').value;
+            var dosis = document.getElementById('dosis').value;
+
+            if (!nombre || !edad || !medicamento || !dosis) {
+                alert('Por favor, complete todos los campos.');
+            } else {
+                var receta = "Receta Médica\n\n";
+                receta += "Nombre del Paciente: " + nombre + "\n";
+                receta += "Edad: " + edad + " años\n\n";
+                receta += "Medicamento: " + medicamento + "\n";
+                receta += "Dosis: " + dosis + "\n";
+
+                document.getElementById('receta').textContent = receta;
+
+                var doc = new jsPDF();
+                doc.text(receta, 10, 10);
+                
+                // Mostrar el botón de descarga y definir la acción de descarga
+                var botonDescargar = document.getElementById('descargarPDF');
+                botonDescargar.style.display = 'block';
+                botonDescargar.onclick = function() {
+                    doc.save('RecetaMedica.pdf');
+                };
+            }
+        }
+    </script>
+</body>
+</html>
